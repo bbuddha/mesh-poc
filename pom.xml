@@ -21,7 +21,7 @@
         <module>spring-petclinic-vets-service</module>
         <module>spring-petclinic-visits-service</module>
         <module>spring-petclinic-config-server</module>
-        <module>spring-petclinic-discovery-server</module>
+        <!--<module>spring-petclinic-discovery-server</module>-->
         <module>spring-petclinic-api-gateway</module>
     </modules>
 
@@ -33,7 +33,7 @@
         <spring-cloud.version>2021.0.0</spring-cloud.version>
         <chaos-monkey-spring-boot.version>2.3.10</chaos-monkey-spring-boot.version>
 
-        <docker.image.prefix>springcommunity</docker.image.prefix>
+        <docker.image.prefix>charter</docker.image.prefix>
         <docker.image.exposed.port>9090</docker.image.exposed.port>
         <docker.image.dockerfile.dir>${basedir}</docker.image.dockerfile.dir>
         <docker.image.dockerize.version>v0.6.1</docker.image.dockerize.version>
