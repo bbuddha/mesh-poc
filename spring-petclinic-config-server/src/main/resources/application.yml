@@ -1,6 +1,13 @@
 server.port: 8888
 spring:
+  application:
+    name: config-server
   cloud:
+    consul:
+      discovery:
+        instance-id: config-server
+      host: consul-server1
+      port: 8500
     config:
       server:
         git:
