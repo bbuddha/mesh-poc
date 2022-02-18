@@ -1,6 +1,9 @@
 spring:
+  application:
+    name: config-server
   cloud:
     config:
       server:
         git:
-          uri: https://github.com/spring-petclinic/spring-petclinic-microservices-config
+          uri: https://github.com/bbuddha/spring-petclinic-microservices-config
+          skipSslValidation: true
