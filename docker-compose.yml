@@ -8,6 +8,16 @@ services:
     ports:
       - 8888:8888
 
+  discovery-server:
+    image: charter/spring-petclinic-discovery-server
+    container_name: discovery-server
+    mem_limit: 512M
+    depends_on:
+      - config-server
+    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+      - 8761:8761
+
   customers-service:
     image: charter/spring-petclinic-customers-service
     container_name: customers-service
@@ -57,15 +67,15 @@ services:
     ports:
       - 9411:9411
 
-  admin-server:
-    image: charter/spring-petclinic-admin-server
-    container_name: admin-server
-    mem_limit: 512M
-    depends_on:
-      - config-server
-    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
-    ports:
-      - 9090:9090
+#  admin-server:
+#    image: charter/spring-petclinic-admin-server
+#    container_name: admin-server
+#    mem_limit: 512M
+#    depends_on:
+#      - config-server
+#    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+#    ports:
+#      - 9090:9090
 
   ## Grafana / Prometheus
 
@@ -83,7 +93,6 @@ services:
     ports:
       - 9091:9090
 
-networks:
-  default:
-    external: true
-    name: consul
+#networks:
+#  default:
+
