@@ -1,19 +1,11 @@
 server.port: 8888
 spring:
-  application:
-    name: config-server
   cloud:
-    consul:
-      discovery:
-        instance-id: config-server
-      host: consul-server1
-      port: 8500
     config:
       server:
         git:
           uri: https://github.com/bbuddha/spring-petclinic-microservices-config
           default-label: main
-          skipSslValidation: true
         # Use the File System Backend to avoid git pulling. Enable "native" profile in the Config Server.
         native:
           searchLocations: file:///${GIT_REPO}

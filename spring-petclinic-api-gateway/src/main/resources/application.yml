@@ -7,25 +7,35 @@ spring:
     gateway:
       routes:
         - id: vets-service
-          uri: lb://vets-service
+          uri: http://localhost:10002
           predicates:
             - Path=/api/vet/**
           filters:
             - StripPrefix=2
         - id: visits-service
-          uri: lb://visits-service
+          uri: http://localhost:10001
           predicates:
             - Path=/api/visit/**
           filters:
             - StripPrefix=2
         - id: customers-service
-          uri: lb://customers-service
+          uri: http://localhost:10000
           predicates:
             - Path=/api/customer/**
           filters:
             - StripPrefix=2
 
+server:
+  port: 80
+  compression:
+    enabled: true
+    mime-types: application/json,text/css,application/javascript
+    min-response-size: 2048
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-server:8761/eureka/
 
 ---
 spring:

@@ -1,71 +1,257 @@
-version: '2'
+version: '3.5'
 
 services:
+
+  #
+  # Kuma Control Plane in "universal" mode with "in-memory" configuration store.
+  #
+  petclinic-cp:
+    image: ${KUMA_CP_DOCKER_IMAGE:-kuma/kuma-cp:latest}
+    container_name: petclinic-cp
+    volumes:
+      - ./certs/server:/certs/server:rw
+      - ./certs/client:/certs/client:rw
+    command:
+      - run
+      - --log-level=debug
+      - --log-output-path=/tmp/kuma.log
+    environment:
+      # DNS name of the Kuma xDS server
+      - KUMA_GENERAL_TLS_CERT_FILE=/certs/server/cert.pem
+      - KUMA_GENERAL_TLS_KEY_FILE=/certs/server/cert.key
+      - KUMA_API_SERVER_AUTHN_TYPE=adminClientCerts
+      - KUMA_API_SERVER_AUTH_CLIENT_CERTS_DIR=/certs/client
+      - KUMA_EXPERIMENTAL_MESHGATEWAY=true
+    expose:
+      - "5678"
+      - "5680"
+      - "5681"
+      - "5682"
+    ports:
+      - "5678:5678"
+      - "5680:5680"
+      - "5681:5681"
+      - "5682:5682"
+    networks:
+      petclinic:
+    restart: on-failure
+
+  mesh-gateway:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    command:
+      - run
+      - --log-level=debug
+      - --log-output-path=/tmp/kuma-dp.log
+      - --dns-enabled=false
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=mesh-gateway
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/mesh-gateway/token
+    ports:
+      - "8080:8080"
+    networks:
+      petclinic:
+        aliases:
+          - mesh-gateway
+    restart: on-failure
+    volumes:
+      - token-mesh-gateway:/mesh-gateway
+      - ./policies:/petclinic/policies
+    depends_on:
+      - petclinic-cp
+
+  #
+  # Run the kuma configuration script for the application
+  #
+  configure-petclinic:
+    image: ${KUMACTL_DOCKER_IMAGE:-kuma/kumactl:latest}
+    container_name: configure-petclinic
+    volumes:
+      - ./configure_petclinic.sh:/petclinic/configure.sh
+      - ./policies:/petclinic/policies:rw
+      - token-customers-service:/customers-service:rw
+      - token-visits-service:/visits-service:rw
+      - token-vets-service:/vets-service:rw
+      - token-api-gateway:/api-gateway:rw
+      - token-mesh-gateway:/mesh-gateway:rw
+      - ./certs/server:/certs/server:rw
+      - ./certs/client:/certs/client:rw
+    user: root # needed to write the tokens, named volumes are mounted with root permissions
+    command:
+      - /petclinic/configure.sh
+    depends_on:
+      - petclinic-cp
+      - customers-service-dp
+      - visits-service-dp
+      - vets-service-dp
+      - api-gateway-dp
+      - mesh-gateway
+    networks:
+      petclinic:
+    restart: on-failure
+
+  #
+  # Container with `kumactl` to apply Kuma resources as part of workflow.
+  #
+  kumactl:
+    image: ${KUMACTL_DOCKER_IMAGE:-kuma/kumactl:latest}
+    container_name: kumactl
+    volumes:
+      - ./policies:/petclinic/policies
+    command:
+      - sh
+      - -c
+      - kumactl config control-planes add --name universal --address http://petclinic-cp:5681 --overwrite && sleep 31536000
+    depends_on:
+      - petclinic-cp
+    networks:
+      petclinic:
+    restart: on-failure
+
   config-server:
     image: charter/spring-petclinic-config-server
     container_name: config-server
     mem_limit: 512M
+    networks:
+      petclinic:
     ports:
-      - 8888:8888
+     - "8888:8888"
 
-  customers-service:
+  customers-service-app:
     image: charter/spring-petclinic-customers-service
-    container_name: customers-service
+    container_name: customers-service-app
     mem_limit: 512M
     depends_on:
-      - config-server
+     - config-server
+     - customers-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
-    ports:
-      - 8081:8081
+    network_mode: service:customers-service-dp
 
-  visits-service:
+  customers-service-dp:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    container_name: customers-service-dp
+    command:
+      - run
+      - --log-level=info
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=customers-service
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/customers-service/token
+    ports:
+      - "8081:8081"
+    networks:
+      petclinic:
+        aliases:
+          - customers-service
+    restart: on-failure
+    volumes:
+      - token-customers-service:/customers-service
+
+  visits-service-app:
     image: charter/spring-petclinic-visits-service
-    container_name: visits-service
+    container_name: visits-service-app
     mem_limit: 512M
     depends_on:
-      - config-server
+     - config-server
+     - visits-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
-    ports:
-      - 8082:8082
+    network_mode: service:visits-service-dp
 
-  vets-service:
+  visits-service-dp:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    container_name: visits-service-dp
+    command:
+      - run
+      - --log-level=info
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=visits-service
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/visits-service/token
+    ports:
+      - "8082:8082"
+    networks:
+      petclinic:
+        aliases:
+          - visits-service
+    restart: on-failure
+    volumes:
+      - token-visits-service:/visits-service
+
+  vets-service-app:
     image: charter/spring-petclinic-vets-service
-    container_name: vets-service
+    container_name: vets-service-app
     mem_limit: 512M
     depends_on:
-      - config-server
+     - config-server
+     - vets-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
-    ports:
-      - 8083:8083
+    network_mode: service:vets-service-dp
 
-  api-gateway:
+  vets-service-dp:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    container_name: vets-service-dp
+    command:
+      - run
+      - --log-level=info
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=vets-service
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/vets-service/token
+    ports:
+      - "8083:8083"
+    networks:
+      petclinic:
+        aliases:
+          - vets-service
+    restart: on-failure
+    volumes:
+      - token-vets-service:/vets-service
+
+  api-gateway-app:
     image: charter/spring-petclinic-api-gateway
-    container_name: api-gateway
+    container_name: api-gateway-app
     mem_limit: 512M
     depends_on:
-      - config-server
+     - config-server
+     - api-gateway-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    network_mode: service:api-gateway-dp
+
+  api-gateway-dp:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    container_name: api-gateway-dp
+    command:
+      - run
+      - --log-level=info
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=api-gateway
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/api-gateway/token
     ports:
-      - 8080:8080
+      - "8000:8000"
+    networks:
+      petclinic:
+        aliases:
+          - api-gateway
+    restart: on-failure
+    volumes:
+      - token-api-gateway:/api-gateway
 
   tracing-server:
     image: openzipkin/zipkin
     container_name: tracing-server
     mem_limit: 512M
     environment:
-      - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+    - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+    networks:
+      petclinic:
     ports:
-      - 9411:9411
-
-  admin-server:
-    image: charter/spring-petclinic-admin-server
-    container_name: admin-server
-    mem_limit: 512M
-    depends_on:
-      - config-server
-    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
-    ports:
-      - 9090:9090
+     - "9411:9411"
 
   ## Grafana / Prometheus
 
@@ -73,17 +259,26 @@ services:
     build: ./docker/grafana
     container_name: grafana-server
     mem_limit: 256M
+    networks:
+      petclinic:
     ports:
-      - 3000:3000
+    - "3000:3000"
 
   prometheus-server:
     build: ./docker/prometheus
     container_name: prometheus-server
     mem_limit: 256M
+    networks:
+      petclinic:
     ports:
-      - 9091:9090
+    - "9091:9090"
 
 networks:
-  default:
-    external: true
-    name: consul
+  petclinic:
+
+volumes:
+  token-customers-service:
+  token-visits-service:
+  token-vets-service:
+  token-api-gateway:
+  token-mesh-gateway:
