@@ -40,7 +40,8 @@ public class VisitsServiceClient {
     public Mono<Visits> getVisitsForPets(final List<Integer> petIds) {
         return webClientBuilder.build()
             .get()
-            .uri(hostname + "pets/visits?petId={petId}", joinIds(petIds))
+//            .uri(hostname + "pets/visits?petId={petId}", joinIds(petIds))
+            .uri("http://localhost:10001/pets/visits?petId={petId}", joinIds(petIds))
             .retrieve()
             .bodyToMono(Visits.class);
     }

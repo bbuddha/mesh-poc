@@ -23,7 +23,7 @@ create_dataplane() {
   resource="$4"
   dataplane="${hostname}"
 
-  echo "create_dataplane hostname=${1}, public=${2}, local=${3}, resource='${4}'"
+  echo "create_dataplane ${dataplane} using hostname=${1}, public=${2}, local=${3}, resource='${4}'"
 
   #
   # Create token for "${dataplane}"
@@ -145,6 +145,28 @@ networking:
       tags:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
+        version: v1
+"
+
+#
+# Create kuma-dp for vets service v2
+# Notice kuma.io/service is explicitly set so v1 and v2
+#
+create_dataplane "vets-service-v2" 8084 80 "
+type: Dataplane
+mesh: default
+name: {{ NAME }}
+networking:
+  admin:
+    port: 9901
+  address: {{ IP }}
+  inbound:
+    - port: {{ PUBLIC_PORT }}
+      servicePort: {{ LOCAL_PORT }}
+      tags:
+        kuma.io/service: vets-service
+        kuma.io/protocol: http
+        version: v2
 "
 
 #

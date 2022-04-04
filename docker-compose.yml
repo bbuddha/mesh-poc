@@ -73,6 +73,7 @@ services:
       - token-customers-service:/customers-service:rw
       - token-visits-service:/visits-service:rw
       - token-vets-service:/vets-service:rw
+      - token-vets-service-v2:/vets-service-v2:rw
       - token-api-gateway:/api-gateway:rw
       - token-mesh-gateway:/mesh-gateway:rw
       - ./certs/server:/certs/server:rw
@@ -183,10 +184,12 @@ services:
   vets-service-app:
     image: charter/spring-petclinic-vets-service
     container_name: vets-service-app
+    environment:
+      - spring.datasource.data=classpath*:db/hsqldb/data.sql
     mem_limit: 512M
     depends_on:
-     - config-server
-     - vets-service-dp
+      - config-server
+      - vets-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-dp
 
@@ -211,13 +214,46 @@ services:
     volumes:
       - token-vets-service:/vets-service
 
+  vets-service-v2-app:
+    image: charter/spring-petclinic-vets-service
+    container_name: vets-service-v2-app
+    environment:
+      - spring.datasource.data=classpath*:db/hsqldb/data2.sql
+    mem_limit: 512M
+    depends_on:
+      - config-server
+      - vets-service-v2-dp
+    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    network_mode: service:vets-service-v2-dp
+
+  vets-service-v2-dp:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    container_name: vets-service-v2-dp
+    command:
+      - run
+      - --log-level=info
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=vets-service-v2
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/vets-service-v2/token
+    ports:
+      - "8084:8084"
+    networks:
+      petclinic:
+        aliases:
+          - vets-service-v2
+    restart: on-failure
+    volumes:
+      - token-vets-service-v2:/vets-service-v2
+
   api-gateway-app:
     image: charter/spring-petclinic-api-gateway
     container_name: api-gateway-app
     mem_limit: 512M
     depends_on:
-     - config-server
-     - api-gateway-dp
+      - config-server
+      - api-gateway-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:api-gateway-dp
 
@@ -247,7 +283,7 @@ services:
     container_name: tracing-server
     mem_limit: 512M
     environment:
-    - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+      - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
     networks:
       petclinic:
     ports:
@@ -280,5 +316,7 @@ volumes:
   token-customers-service:
   token-visits-service:
   token-vets-service:
+  token-vets-service-v2:
   token-api-gateway:
   token-mesh-gateway:
+
