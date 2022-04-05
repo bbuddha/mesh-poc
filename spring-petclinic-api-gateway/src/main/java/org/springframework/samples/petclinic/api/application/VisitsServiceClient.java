@@ -33,15 +33,15 @@ import static java.util.stream.Collectors.joining;
 public class VisitsServiceClient {
 
     // Could be changed for testing purpose
-    private String hostname = "http://visits-service/";
+    private String hostname = "http://localhost:10001/";
 
     private final WebClient.Builder webClientBuilder;
 
     public Mono<Visits> getVisitsForPets(final List<Integer> petIds) {
         return webClientBuilder.build()
             .get()
-//            .uri(hostname + "pets/visits?petId={petId}", joinIds(petIds))
-            .uri("http://localhost:10001/pets/visits?petId={petId}", joinIds(petIds))
+            .uri(hostname + "pets/visits?petId={petId}", joinIds(petIds))
+//            .uri("http://localhost:10001/pets/visits?petId={petId}", joinIds(petIds))
             .retrieve()
             .bodyToMono(Visits.class);
     }
