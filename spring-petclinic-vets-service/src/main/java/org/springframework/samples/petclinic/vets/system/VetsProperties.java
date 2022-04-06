@@ -32,9 +32,7 @@ public class VetsProperties {
 
     @Data
     public static class Cache {
-
         private int ttl;
-
         private int heapSize;
     }
 }

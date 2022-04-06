@@ -146,6 +146,10 @@ networking:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
         version: v1
+  outbound:
+    - port: 10000
+      tags:
+        kuma.io/service: offers-service
 "
 
 #
@@ -167,6 +171,29 @@ networking:
         kuma.io/service: vets-service
         kuma.io/protocol: http
         version: v2
+  outbound:
+    - port: 10000
+      tags:
+        kuma.io/service: offers-service
+"
+
+#
+# Create kuma-dp for offers service
+#
+create_dataplane "offers-service" 8085 80 "
+type: Dataplane
+mesh: default
+name: {{ NAME }}
+networking:
+  admin:
+    port: 9901
+  address: {{ IP }}
+  inbound:
+    - port: {{ PUBLIC_PORT }}
+      servicePort: {{ LOCAL_PORT }}
+      tags:
+        kuma.io/service: {{ NAME }}
+        kuma.io/protocol: http
 "
 
 #
