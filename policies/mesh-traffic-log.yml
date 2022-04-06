@@ -1,7 +1,7 @@
 type: TrafficLog
 name: all-traffic
 mesh: default
-# this TrafficLog policy applies only to traffic from service `backend` to service `database`.
+# this TrafficLog policy applies only to traffic from all `source` services to service `destinations`.
 sources:
   - match:
       kuma.io/service: '*'
