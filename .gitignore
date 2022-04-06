@@ -19,3 +19,7 @@ target/
 
 # Branch switching
 generated/
+
+certs/
+
+logs/
