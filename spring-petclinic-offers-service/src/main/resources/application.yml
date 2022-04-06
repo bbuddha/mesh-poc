@@ -3,11 +3,11 @@ server:
 
 spring:
   application:
-    name: vets-service
+    name: offers-service
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/}
   cache:
-    cache-names: vets
+    cache-names: offers
   profiles:
     active: production
 

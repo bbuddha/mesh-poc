@@ -17,7 +17,10 @@ package org.springframework.samples.petclinic.vets.web;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.samples.petclinic.vets.model.Vet;
 import org.springframework.samples.petclinic.vets.model.VetRepository;
@@ -38,9 +41,22 @@ import org.springframework.web.bind.annotation.RestController;
 class VetResource {
 
     private final VetRepository vetRepository;
+    private final OffersClient client;
 
     @GetMapping
     public List<Vet> showResourcesVetList() {
-        return vetRepository.findAll();
+        List<Vet> vets = vetRepository.findAll();
+        List<String> offers = client.getOffers();
+        for (Vet vet: vets) {
+            vet.setOffers(nextRandomN(offers, (int) (Math.random() * 3)));
+        }
+        return vets;
+    }
+
+    private <T> List<T> nextRandomN(List<T> list, int n) {
+        return Stream
+            .generate(() -> list.remove((int) (list.size() * Math.random())))
+            .limit(Math.min(list.size(), n))
+            .collect(Collectors.toList());
     }
 }

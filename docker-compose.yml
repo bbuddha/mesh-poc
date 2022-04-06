@@ -74,6 +74,7 @@ services:
       - token-visits-service:/visits-service:rw
       - token-vets-service:/vets-service:rw
       - token-vets-service-v2:/vets-service-v2:rw
+      - token-offers-service:/offers-service:rw
       - token-api-gateway:/api-gateway:rw
       - token-mesh-gateway:/mesh-gateway:rw
       - ./certs/server:/certs/server:rw
@@ -86,6 +87,7 @@ services:
       - customers-service-dp
       - visits-service-dp
       - vets-service-dp
+      - offers-service-dp
       - api-gateway-dp
       - mesh-gateway
     networks:
@@ -247,6 +249,37 @@ services:
     volumes:
       - token-vets-service-v2:/vets-service-v2
 
+  offers-service-app:
+    image: charter/spring-petclinic-offers-service
+    container_name: offers-service-app
+    mem_limit: 512M
+    depends_on:
+      - config-server
+      - offers-service-dp
+    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    network_mode: service:offers-service-dp
+
+  offers-service-dp:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    container_name: offers-service-dp
+    command:
+      - run
+      - --log-level=info
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=offers-service
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/offers-service/token
+    ports:
+      - "8085:8085"
+    networks:
+      petclinic:
+        aliases:
+          - offers-service
+    restart: on-failure
+    volumes:
+      - token-offers-service:/offers-service
+
   api-gateway-app:
     image: charter/spring-petclinic-api-gateway
     container_name: api-gateway-app
@@ -317,6 +350,7 @@ volumes:
   token-visits-service:
   token-vets-service:
   token-vets-service-v2:
+  token-offers-service:
   token-api-gateway:
   token-mesh-gateway:
 
