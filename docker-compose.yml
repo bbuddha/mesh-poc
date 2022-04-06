@@ -22,6 +22,7 @@ services:
       - KUMA_API_SERVER_AUTHN_TYPE=adminClientCerts
       - KUMA_API_SERVER_AUTH_CLIENT_CERTS_DIR=/certs/client
       - KUMA_EXPERIMENTAL_MESHGATEWAY=true
+      - KUMA_REPORTS_ENABLED=true
     expose:
       - "5678"
       - "5680"
@@ -58,6 +59,7 @@ services:
     volumes:
       - token-mesh-gateway:/mesh-gateway
       - ./policies:/petclinic/policies
+      - //c/var/mesh-gateway:/tmp
     depends_on:
       - petclinic-cp
 
@@ -125,11 +127,16 @@ services:
     image: charter/spring-petclinic-customers-service
     container_name: customers-service-app
     mem_limit: 512M
+    environment:
+      - spring.zipkin.base-url=http://jaeger-collector:9412/
+      - LOG_FILE=/tmp/customers-service-app.log
     depends_on:
      - config-server
      - customers-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:customers-service-dp
+    volumes:
+      - //c/var/app-logs:/tmp
 
   customers-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -142,8 +149,6 @@ services:
       - KUMA_DATAPLANE_MESH=default
       - KUMA_DATAPLANE_NAME=customers-service
       - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/customers-service/token
-    ports:
-      - "8081:8081"
     networks:
       petclinic:
         aliases:
@@ -151,16 +156,22 @@ services:
     restart: on-failure
     volumes:
       - token-customers-service:/customers-service
+      - //c/var/customers-service-dp:/tmp
 
   visits-service-app:
     image: charter/spring-petclinic-visits-service
     container_name: visits-service-app
     mem_limit: 512M
+    environment:
+      - spring.zipkin.base-url=http://jaeger-collector:9412/
+      - LOG_FILE=/tmp/visits-service-app.log
     depends_on:
      - config-server
      - visits-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:visits-service-dp
+    volumes:
+      - //c/var/app-logs:/tmp
 
   visits-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -173,8 +184,6 @@ services:
       - KUMA_DATAPLANE_MESH=default
       - KUMA_DATAPLANE_NAME=visits-service
       - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/visits-service/token
-    ports:
-      - "8082:8082"
     networks:
       petclinic:
         aliases:
@@ -182,18 +191,23 @@ services:
     restart: on-failure
     volumes:
       - token-visits-service:/visits-service
+      - //c/var/visits-service-dp:/tmp
 
   vets-service-app:
     image: charter/spring-petclinic-vets-service
     container_name: vets-service-app
     environment:
       - spring.datasource.data=classpath*:db/hsqldb/data.sql
+      - spring.zipkin.base-url=http://jaeger-collector:9412/
+      - LOG_FILE=/tmp/vets-service-app.log
     mem_limit: 512M
     depends_on:
       - config-server
       - vets-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-dp
+    volumes:
+      - //c/var/applogs:/tmp
 
   vets-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -206,8 +220,6 @@ services:
       - KUMA_DATAPLANE_MESH=default
       - KUMA_DATAPLANE_NAME=vets-service
       - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/vets-service/token
-    ports:
-      - "8083:8083"
     networks:
       petclinic:
         aliases:
@@ -215,18 +227,23 @@ services:
     restart: on-failure
     volumes:
       - token-vets-service:/vets-service
+      - //c/var/vets-service-dp:/tmp
 
   vets-service-v2-app:
     image: charter/spring-petclinic-vets-service
     container_name: vets-service-v2-app
     environment:
       - spring.datasource.data=classpath*:db/hsqldb/data2.sql
+      - spring.zipkin.base-url=http://jaeger-collector:9412/
+      - LOG_FILE=/tmp/vets-service-v2-app.log
     mem_limit: 512M
     depends_on:
       - config-server
       - vets-service-v2-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-v2-dp
+    volumes:
+      - //c/var/app-logs:/tmp
 
   vets-service-v2-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -239,8 +256,6 @@ services:
       - KUMA_DATAPLANE_MESH=default
       - KUMA_DATAPLANE_NAME=vets-service-v2
       - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/vets-service-v2/token
-    ports:
-      - "8084:8084"
     networks:
       petclinic:
         aliases:
@@ -248,6 +263,7 @@ services:
     restart: on-failure
     volumes:
       - token-vets-service-v2:/vets-service-v2
+      - //c/var/vets-service-v2-dp:/tmp
 
   offers-service-app:
     image: charter/spring-petclinic-offers-service
@@ -284,11 +300,16 @@ services:
     image: charter/spring-petclinic-api-gateway
     container_name: api-gateway-app
     mem_limit: 512M
+    environment:
+      - spring.zipkin.base-url=http://jaeger-collector:9412/
+      - LOG_FILE=/tmp/api-gateway-app.log
     depends_on:
       - config-server
       - api-gateway-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:api-gateway-dp
+    volumes:
+      - //c/var/app-logs:/tmp
 
   api-gateway-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -301,8 +322,6 @@ services:
       - KUMA_DATAPLANE_MESH=default
       - KUMA_DATAPLANE_NAME=api-gateway
       - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/api-gateway/token
-    ports:
-      - "8000:8000"
     networks:
       petclinic:
         aliases:
@@ -310,6 +329,7 @@ services:
     restart: on-failure
     volumes:
       - token-api-gateway:/api-gateway
+      - //c/var/api-gateway-dp:/tmp
 
   tracing-server:
     image: openzipkin/zipkin
@@ -322,11 +342,22 @@ services:
     ports:
      - "9411:9411"
 
+  jaeger-collector:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-collector
+    mem_limit: 512M
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9412
+    networks:
+      petclinic:
+    ports:
+      - "9412:9412"
+      - "16686:16686"
+
   ## Grafana / Prometheus
 
   grafana-server:
-    build: ./docker/grafana
-    container_name: grafana-server
+    image: grafana/grafana:master
     mem_limit: 256M
     networks:
       petclinic:
@@ -341,6 +372,25 @@ services:
       petclinic:
     ports:
     - "9091:9090"
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml -log.level=debug
+    networks:
+      - petclinic
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./conf:/etc/promtail
+      - //c/var:/var
+    command: -config.file=/etc/promtail/docker-promtail-config.yaml -log.level=debug
+    networks:
+      - petclinic
 
 networks:
   petclinic:
