@@ -1,0 +1,13 @@
+type: TrafficLog
+name: all-traffic
+mesh: default
+# this TrafficLog policy applies only to traffic from service `backend` to service `database`.
+sources:
+  - match:
+      kuma.io/service: '*'
+destinations:
+  - match:
+      kuma.io/service: '*'
+conf:
+  # Forward the logs into the logging backend named `loki`.
+  backend: loki
