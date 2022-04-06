@@ -59,7 +59,7 @@ services:
     volumes:
       - token-mesh-gateway:/mesh-gateway
       - ./policies:/petclinic/policies
-      - //c/var/mesh-gateway:/tmp
+      - ./logs/mesh-gateway:/tmp
     depends_on:
       - petclinic-cp
 
@@ -136,7 +136,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:customers-service-dp
     volumes:
-      - //c/var/app-logs:/tmp
+      - ./logs/app:/tmp
 
   customers-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -156,7 +156,7 @@ services:
     restart: on-failure
     volumes:
       - token-customers-service:/customers-service
-      - //c/var/customers-service-dp:/tmp
+      - ./logs/customers-service-dp:/tmp
 
   visits-service-app:
     image: charter/spring-petclinic-visits-service
@@ -171,7 +171,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:visits-service-dp
     volumes:
-      - //c/var/app-logs:/tmp
+      - ./logs/app:/tmp
 
   visits-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -191,7 +191,7 @@ services:
     restart: on-failure
     volumes:
       - token-visits-service:/visits-service
-      - //c/var/visits-service-dp:/tmp
+      - ./logs/visits-service-dp:/tmp
 
   vets-service-app:
     image: charter/spring-petclinic-vets-service
@@ -207,7 +207,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-dp
     volumes:
-      - //c/var/applogs:/tmp
+      - ./logs/app:/tmp
 
   vets-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -227,7 +227,7 @@ services:
     restart: on-failure
     volumes:
       - token-vets-service:/vets-service
-      - //c/var/vets-service-dp:/tmp
+      - ./logs/vets-service-dp:/tmp
 
   vets-service-v2-app:
     image: charter/spring-petclinic-vets-service
@@ -243,7 +243,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-v2-dp
     volumes:
-      - //c/var/app-logs:/tmp
+      - ./logs/app:/tmp
 
   vets-service-v2-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -263,7 +263,7 @@ services:
     restart: on-failure
     volumes:
       - token-vets-service-v2:/vets-service-v2
-      - //c/var/vets-service-v2-dp:/tmp
+      - ./logs/vets-service-v2-dp:/tmp
 
   offers-service-app:
     image: charter/spring-petclinic-offers-service
@@ -309,7 +309,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:api-gateway-dp
     volumes:
-      - //c/var/app-logs:/tmp
+      - ./logs/app:/tmp
 
   api-gateway-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -329,18 +329,7 @@ services:
     restart: on-failure
     volumes:
       - token-api-gateway:/api-gateway
-      - //c/var/api-gateway-dp:/tmp
-
-  tracing-server:
-    image: openzipkin/zipkin
-    container_name: tracing-server
-    mem_limit: 512M
-    environment:
-      - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
-    networks:
-      petclinic:
-    ports:
-     - "9411:9411"
+      - ./logs/api-gateway-dp:/tmp
 
   jaeger-collector:
     image: jaegertracing/all-in-one:latest
@@ -387,7 +376,7 @@ services:
     container_name: promtail
     volumes:
       - ./conf:/etc/promtail
-      - //c/var:/var
+      - ./logs:/tmp
     command: -config.file=/etc/promtail/docker-promtail-config.yaml -log.level=debug
     networks:
       - petclinic
