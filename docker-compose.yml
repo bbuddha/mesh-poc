@@ -274,6 +274,8 @@ services:
       - offers-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:offers-service-dp
+    volumes:
+      - ./logs/app:/tmp
 
   offers-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -295,6 +297,7 @@ services:
     restart: on-failure
     volumes:
       - token-offers-service:/offers-service
+      - ./logs/offers-service-dp:/tmp
 
   api-gateway-app:
     image: charter/spring-petclinic-api-gateway
