@@ -11,6 +11,7 @@ services:
     volumes:
       - ./certs/server:/certs/server:rw
       - ./certs/client:/certs/client:rw
+      - ./logs/kuma-cp:/tmp
     command:
       - run
       - --log-level=debug
@@ -40,11 +41,39 @@ services:
   #
   # Run the kuma configuration script for the application
   #
+  create-dp-token:
+    image: ${KUMACTL_DOCKER_IMAGE:-kuma/kumactl:latest}
+    container_name: create-dp-token
+    volumes:
+      - ./setup:/petclinic
+      - token-customers-service:/customers-service:rw
+      - token-visits-service:/visits-service:rw
+      - token-vets-service:/vets-service:rw
+      - token-vets-service-v2:/vets-service-v2:rw
+      - token-offers-service:/offers-service:rw
+      - token-api-gateway:/api-gateway:rw
+      - token-mesh-gateway:/mesh-gateway:rw
+      - ./certs/server:/certs/server:rw
+      - ./certs/client:/certs/client:rw
+    user: root # needed to write the tokens, named volumes are mounted with root permissions
+    command:
+      - /petclinic/create_dp_token.sh
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+    depends_on:
+      - petclinic-cp
+    networks:
+      petclinic:
+    restart: on-failure
+
+  #
+  # Run the kuma configuration script for the application
+  #
   configure-petclinic:
     image: ${KUMACTL_DOCKER_IMAGE:-kuma/kumactl:latest}
     container_name: configure-petclinic
     volumes:
-      - ./configure_petclinic.sh:/petclinic/configure.sh
+      - ./setup:/petclinic
       - ./policies:/petclinic/policies:rw
       - token-customers-service:/customers-service:rw
       - token-visits-service:/visits-service:rw
@@ -57,7 +86,7 @@ services:
       - ./certs/client:/certs/client:rw
     user: root # needed to write the tokens, named volumes are mounted with root permissions
     command:
-      - /petclinic/configure.sh
+      - /petclinic/configure_dataplane.sh
     depends_on:
       - petclinic-cp
       - customers-service-dp
@@ -128,6 +157,8 @@ services:
         aliases:
           - customers-service
     restart: on-failure
+    depends_on:
+      - create-dp-token
     volumes:
       - token-customers-service:/customers-service
       - ./logs/customers-service-dp:/tmp
@@ -163,6 +194,8 @@ services:
         aliases:
           - visits-service
     restart: on-failure
+    depends_on:
+      - create-dp-token
     volumes:
       - token-visits-service:/visits-service
       - ./logs/visits-service-dp:/tmp
@@ -199,6 +232,8 @@ services:
         aliases:
           - vets-service
     restart: on-failure
+    depends_on:
+      - create-dp-token
     volumes:
       - token-vets-service:/vets-service
       - ./logs/vets-service-dp:/tmp
@@ -235,6 +270,8 @@ services:
         aliases:
           - vets-service-v2
     restart: on-failure
+    depends_on:
+      - create-dp-token
     volumes:
       - token-vets-service-v2:/vets-service-v2
       - ./logs/vets-service-v2-dp:/tmp
@@ -269,6 +306,8 @@ services:
         aliases:
           - offers-service
     restart: on-failure
+    depends_on:
+      - create-dp-token
     volumes:
       - token-offers-service:/offers-service
       - ./logs/offers-service-dp:/tmp
@@ -304,6 +343,8 @@ services:
         aliases:
           - api-gateway
     restart: on-failure
+    depends_on:
+      - create-dp-token
     volumes:
       - token-api-gateway:/api-gateway
       - ./logs/api-gateway-dp:/tmp
@@ -333,6 +374,7 @@ services:
       - ./logs/mesh-gateway:/tmp
     depends_on:
       - petclinic-cp
+      - create-dp-token
 
 
   jaeger-collector:
