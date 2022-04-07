@@ -14,7 +14,7 @@ services:
     command:
       - run
       - --log-level=debug
-      - --log-output-path=/tmp/kuma.log
+      - --log-output-path=/tmp/kuma-cp.log
     environment:
       # DNS name of the Kuma xDS server
       - KUMA_GENERAL_TLS_CERT_FILE=/certs/server/cert.pem
@@ -36,32 +36,6 @@ services:
     networks:
       petclinic:
     restart: on-failure
-
-  mesh-gateway:
-    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
-    command:
-      - run
-      - --log-level=debug
-      - --log-output-path=/tmp/kuma-dp.log
-      - --dns-enabled=false
-    environment:
-      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
-      - KUMA_DATAPLANE_MESH=default
-      - KUMA_DATAPLANE_NAME=mesh-gateway
-      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/mesh-gateway/token
-    ports:
-      - "8080:8080"
-    networks:
-      petclinic:
-        aliases:
-          - mesh-gateway
-    restart: on-failure
-    volumes:
-      - token-mesh-gateway:/mesh-gateway
-      - ./policies:/petclinic/policies
-      - ./logs/mesh-gateway:/tmp
-    depends_on:
-      - petclinic-cp
 
   #
   # Run the kuma configuration script for the application
@@ -333,6 +307,33 @@ services:
     volumes:
       - token-api-gateway:/api-gateway
       - ./logs/api-gateway-dp:/tmp
+
+  mesh-gateway:
+    image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
+    command:
+      - run
+      - --log-level=debug
+      - --log-output-path=/tmp/kuma-dp.log
+      - --dns-enabled=false
+    environment:
+      - KUMA_CONTROL_PLANE_URL=https://petclinic-cp:5678
+      - KUMA_DATAPLANE_MESH=default
+      - KUMA_DATAPLANE_NAME=mesh-gateway
+      - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/mesh-gateway/token
+    ports:
+      - "8080:8080"
+    networks:
+      petclinic:
+        aliases:
+          - mesh-gateway
+    restart: on-failure
+    volumes:
+      - token-mesh-gateway:/mesh-gateway
+      - ./policies:/petclinic/policies
+      - ./logs/mesh-gateway:/tmp
+    depends_on:
+      - petclinic-cp
+
 
   jaeger-collector:
     image: jaegertracing/all-in-one:latest
