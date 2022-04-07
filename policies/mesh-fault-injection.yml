@@ -1,0 +1,20 @@
+type: FaultInjection
+mesh: default
+name: fi1
+sources:
+  - match:
+      kuma.io/service: api-gateway
+      # Can also specify version. ex version: "1.0"
+destinations:
+  - match:
+      kuma.io/service: offers-service
+conf:
+  abort:
+    httpStatus: 500
+    percentage: 50
+  delay:
+    percentage: 50.5
+    value: 5s
+  responseBandwidth:
+    limit: 50 mbps
+    percentage: 50
