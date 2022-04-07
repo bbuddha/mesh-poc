@@ -1,0 +1,69 @@
+apiVersion: kuma.io/v1alpha1
+kind: TrafficPermission
+mesh: default
+metadata:
+  name: allow-vets-service-to-offers-service-traffic
+spec:
+  sources:
+    - match:
+        kuma.io/service: 'vets-service'
+  destinations:
+    - match:
+        kuma.io/service: 'offers-service'
+
+---
+apiVersion: kuma.io/v1alpha1
+kind: TrafficPermission
+mesh: default
+metadata:
+  name: allow-api-gateway-to-customers-service-traffic
+spec:
+  sources:
+    - match:
+        kuma.io/service: 'api-gateway'
+  destinations:
+    - match:
+        kuma.io/service: 'customers-service'
+
+---
+apiVersion: kuma.io/v1alpha1
+kind: TrafficPermission
+mesh: default
+metadata:
+  name: allow-api-gateway-to-visits-service-traffic
+spec:
+  sources:
+    - match:
+        kuma.io/service: 'api-gateway'
+  destinations:
+    - match:
+        kuma.io/service: 'visits-service'
+
+---
+apiVersion: kuma.io/v1alpha1
+kind: TrafficPermission
+mesh: default
+metadata:
+  name: allow-api-gateway-to-vets-service-traffic
+spec:
+  sources:
+    - match:
+        kuma.io/service: 'api-gateway'
+  destinations:
+    - match:
+        kuma.io/service: 'vets-service'
+
+---
+apiVersion: kuma.io/v1alpha1
+kind: TrafficPermission
+mesh: default
+metadata:
+  name: allow-api-gateway-to-offers-service-traffic
+spec:
+  sources:
+    - match:
+        kuma.io/service: 'api-gateway'
+  destinations:
+    - match:
+        kuma.io/service: 'offers-service'
+

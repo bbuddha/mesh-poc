@@ -238,3 +238,5 @@ networking:
 
 kumactl apply -f /petclinic/policies/mesh-gateway.yml
 kumactl apply -f /petclinic/policies/mesh-gateway-route.yml
+kumactl apply -f /petclinic/policies/allow-traffic-defaults.yml
+
