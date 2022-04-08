@@ -9,8 +9,8 @@ cp_url=https://petclinic-cp:5682
 if [ ! -f /certs/client/cert.key ]; then
   echo "Generating client certificate"
   kumactl generate tls-certificate --type=client --hostname=${cp_name} --key-file=/certs/client/cert.key --cert-file=/certs/client/cert.pem
-  chmod 666 /certs/server/cert.key
-  chmod 666 /certs/server/cert.pem
+  chmod 666 /certs/client/cert.key
+  chmod 666 /certs/client/cert.pem
 fi
 if [ ! -f /certs/server/cert.key ]; then
   echo "Generating server certificate"
