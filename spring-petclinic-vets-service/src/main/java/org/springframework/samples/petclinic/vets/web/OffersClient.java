@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -23,7 +24,8 @@ public class OffersClient {
             offers = response.getBody();
             Collections.shuffle(offers);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.warn(e.getMessage());
+            offers = Collections.singletonList("Offers not available, please try later.");
         }
         return offers;
     }

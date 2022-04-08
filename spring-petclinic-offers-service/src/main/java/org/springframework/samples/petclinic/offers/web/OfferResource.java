@@ -21,7 +21,6 @@ class OfferResource {
     @GetMapping
     public List<String> getOffers() {
         List<Offer> offers = offerRepository.findAll();
-        System.out.println(offers);
         return offers.stream().map(offer -> offer.getDescription()).collect(Collectors.toList());
     }
 }

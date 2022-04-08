@@ -48,7 +48,11 @@ class VetResource {
         List<Vet> vets = vetRepository.findAll();
         List<String> offers = client.getOffers();
         for (Vet vet: vets) {
-            vet.setOffers(nextRandomN(offers, (int) (Math.random() * 3)));
+            if (offers.size() > 1) {
+                vet.setOffers(nextRandomN(offers, (int) (Math.random() * 3)));
+            } else {
+                vet.setOffers(offers);
+            }
         }
         return vets;
     }
