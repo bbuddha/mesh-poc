@@ -1,0 +1,26 @@
+type: TrafficRoute
+name: route-to-vets-service
+mesh: default
+sources:
+  - match:
+      kuma.io/service: api-gateway
+destinations:
+  - match:
+      kuma.io/service: vets-service
+conf:
+  http:
+    - match:
+        path:
+          prefix: '/'
+      split:
+        - weight: 2
+          destination:
+            kuma.io/service: vets-service
+            version: 'v1'
+        - weight: 1
+          destination:
+            kuma.io/service: vets-service
+            version: 'v2'
+  destination: # default rule is applied when endpoint does not match any rules in http section
+    kuma.io/service: vets-service
+    version: 'v1'
