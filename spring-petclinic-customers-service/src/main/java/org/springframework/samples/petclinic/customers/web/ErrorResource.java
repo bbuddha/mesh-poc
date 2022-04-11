@@ -33,7 +33,7 @@ import java.util.List;
  */
 @RequestMapping("/errors")
 @RestController
-@Timed("petclinic.owner")
+@Timed("petclinic.error")
 @RequiredArgsConstructor
 @Slf4j
 class ErrorResource {

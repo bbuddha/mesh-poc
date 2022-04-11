@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @RequestMapping("/externalService")
 @RestController
-@Timed("petclinic.owner")
+@Timed("petclinic.externalService")
 @RequiredArgsConstructor
 @Slf4j
 class ExternalServiceResource {
