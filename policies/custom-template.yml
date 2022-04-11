@@ -1,0 +1,14 @@
+type: ProxyTemplate
+mesh: default
+name: custom-template-1
+selectors:
+  - match:
+      kuma.io/service: '*'
+conf:
+  imports:
+    - default-proxy
+  modifications:
+    - listener:
+        operation: patch
+        value: | # you can specify only part of cluster definition that will be merged into existing cluster
+          streamIdleTimeout: 5m

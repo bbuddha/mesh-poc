@@ -280,6 +280,10 @@ services:
     image: charter/spring-petclinic-offers-service
     container_name: offers-service-app
     mem_limit: 512M
+    environment:
+      - spring.datasource.data=classpath*:db/hsqldb/data2.sql
+      - spring.zipkin.base-url=http://jaeger-collector:9412/
+      - LOG_FILE=/tmp/offers-service-app.log
     depends_on:
       - config-server
       - offers-service-dp
@@ -342,6 +346,8 @@ services:
       petclinic:
         aliases:
           - api-gateway
+    ports:
+      - "8000:8000"
     restart: on-failure
     depends_on:
       - create-dp-token
@@ -424,6 +430,14 @@ services:
       - ./conf:/etc/promtail
       - ./logs:/tmp
     command: -config.file=/etc/promtail/docker-promtail-config.yaml -log.level=debug
+    networks:
+      - petclinic
+
+  httpbin:
+    image: kennethreitz/httpbin
+    profiles:
+      - "extras"
+    container_name: httpbin
     networks:
       - petclinic
 

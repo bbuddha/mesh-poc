@@ -92,6 +92,10 @@ networking:
       tags:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
+  outbound:
+      - port: 10000
+        tags:
+          kuma.io/service: httpbin
 "
 
 #

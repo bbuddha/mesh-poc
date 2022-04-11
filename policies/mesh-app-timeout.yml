@@ -1,0 +1,25 @@
+type: Timeout
+mesh: default
+name: timeouts-backend
+sources:
+  - match:
+      kuma.io/service: api-gateway
+destinations:
+  - match:
+      kuma.io/service: customers-service
+conf:
+  # connectTimeout defines time to establish connection, 'connect_timeout' on Cluster, default 10s
+  connectTimeout: 10s
+  tcp:
+    # 'idle_timeout' on TCPProxy, disabled by default
+    idleTimeout: 1h
+  http:
+    # 'timeout' on Route, disabled by default
+    requestTimeout: 5s
+    # 'idle_timeout' on Cluster, disabled by default
+    idleTimeout: 1h
+#  grpc:
+#    # 'stream_idle_timeout' on HttpConnectionManager, disabled by default
+#    streamIdleTimeout: 5m
+#    # 'max_stream_duration' on Cluster, disabled by default
+#    maxStreamDuration: 30m

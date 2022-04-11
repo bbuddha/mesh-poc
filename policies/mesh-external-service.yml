@@ -1,0 +1,10 @@
+type: ExternalService
+mesh: default
+name: httpbin
+tags:
+  kuma.io/service: httpbin
+  kuma.io/protocol: http
+networking:
+  address: httpbin:80
+  tls:
+    enabled: false

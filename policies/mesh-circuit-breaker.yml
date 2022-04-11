@@ -1,0 +1,13 @@
+type: CircuitBreaker
+mesh: default
+name: circuit-breaker-example
+sources:
+  - match:
+      kuma.io/service: api-gateway
+destinations:
+  - match:
+      kuma.io/service: customers-service
+conf:
+  detectors:
+    totalErrors: {}
+    standardDeviation: {}

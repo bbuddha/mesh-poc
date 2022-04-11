@@ -1,0 +1,25 @@
+type: HealthCheck
+name: web-to-backend-check
+mesh: default
+sources:
+  - match:
+      kuma.io/service: api-gateway
+destinations:
+  - match:
+      kuma.io/service: customers-service
+conf:
+  interval: 10s
+  timeout: 2s
+  unhealthyThreshold: 3
+  healthyThreshold: 1
+  http:
+    path: /actuator/health
+    requestHeadersToAdd:
+      - append: false
+        header:
+          key: Content-Type
+          value: application/json
+      - header:
+          key: Accept
+          value: application/json
+    expectedStatuses: [200, 201]
