@@ -50,6 +50,6 @@ class ErrorResource {
     @GetMapping
     public List<String> findAll() {
         logRequestCount();
-        throw new ResourceNotFoundException("Fake error.");
+        throw new ServerException("Fake error.");
     }
 }

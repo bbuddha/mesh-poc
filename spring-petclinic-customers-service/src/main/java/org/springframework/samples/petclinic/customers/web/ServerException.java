@@ -3,10 +3,10 @@ package org.springframework.samples.petclinic.customers.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+public class ServerException extends RuntimeException {
 
-    public ResourceNotFoundException(String message) {
+    public ServerException(String message) {
         super(message);
     }
 
