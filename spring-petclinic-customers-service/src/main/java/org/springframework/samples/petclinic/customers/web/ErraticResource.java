@@ -20,8 +20,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,12 +33,12 @@ import java.util.List;
  * @author Michael Isvy
  * @author Maciej Szarlinski
  */
-@RequestMapping("/errors")
+@RequestMapping("/erratic")
 @RestController
 @Timed("petclinic.error")
 @RequiredArgsConstructor
 @Slf4j
-class ErrorResource {
+class ErraticResource {
 
     private int requestCount = 0;
 
@@ -48,8 +50,11 @@ class ErrorResource {
      * Read List of Owners
      */
     @GetMapping
-    public List<String> findAll() {
+    public List<String> findAll(@RequestParam int errorRate) {
         logRequestCount();
-        throw new ServerException("Fake error.");
+        if(requestCount % errorRate == 0 ){
+            throw new ServerException("Fake error.");
+        }
+        return Arrays.asList("OK");
     }
 }

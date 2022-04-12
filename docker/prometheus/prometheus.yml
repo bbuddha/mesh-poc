@@ -7,26 +7,56 @@ global:
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:
-- job_name: prometheus
-  static_configs:
-  - targets: ['localhost:9090']
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
 
-- job_name: api-gateway
-  metrics_path: /actuator/prometheus
-  static_configs:
-  - targets: ['api-gateway:8080']
+  - job_name: api-gateway-dp
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['api-gateway:5670']
 
-- job_name: customers-service
-  metrics_path: /actuator/prometheus
-  static_configs:
-  - targets: ['customers-service:8081']
+  - job_name: api-gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['api-gateway:8000']
 
-- job_name: visits-service
-  metrics_path: /actuator/prometheus
-  static_configs:
-  - targets: ['visits-service:8082']
+  - job_name: customers-service-dp
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['customers-service:5670']
 
-- job_name: vets-service
-  metrics_path: /actuator/prometheus
-  static_configs:
-  - targets: ['vets-service:8083']
+  - job_name: customers-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['customers-service:8081']
+
+  - job_name: visits-service-dp
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['visits-service:5670']
+
+  - job_name: visits-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['visits-service:8082']
+
+  - job_name: vets-service-dp
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['vets-service:5670']
+
+  - job_name: vets-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['vets-service:8083']
+
+  - job_name: vets-service-v2-dp
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['vets-service-v2:5670']
+
+  - job_name: vets-service-v2
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['vets-service-v2:8084']

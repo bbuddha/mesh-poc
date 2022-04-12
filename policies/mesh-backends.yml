@@ -16,3 +16,10 @@ logging:
       type: file
       conf:
         path: /tmp/kuma-access.log
+metrics:
+  enabledBackend: prometheus-1
+  backends:
+    - name: prometheus-1
+      type: prometheus
+      conf:
+        skipMTLS: true # by default mTLS metrics are also protected by mTLS. Scraping metrics with mTLS without transparent proxy is not supported at the moment.

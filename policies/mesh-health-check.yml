@@ -1,19 +1,20 @@
 type: HealthCheck
-name: web-to-backend-check
+name: all-to-all-health-check
 mesh: default
 sources:
   - match:
-      kuma.io/service: api-gateway
+      kuma.io/service: '*'
 destinations:
   - match:
-      kuma.io/service: customers-service
+      kuma.io/service: '*'
 conf:
   interval: 10s
   timeout: 2s
   unhealthyThreshold: 3
   healthyThreshold: 1
+  eventLogPath: "/tmp/health-check.log"
   http:
-    path: /actuator/health
+    path: /health
     requestHeadersToAdd:
       - append: false
         header:

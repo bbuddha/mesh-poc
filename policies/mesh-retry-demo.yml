@@ -1,0 +1,27 @@
+type: Retry
+mesh: default
+name: retry-demo
+sources:
+  - match:
+      kuma.io/service: api-gateway
+destinations:
+  - match:
+      kuma.io/service: customers-service
+conf:
+  http:
+    numRetries: 5
+    perTryTimeout: 16s
+    backOff:
+      baseInterval: 0.025s
+      maxInterval: 0.250s
+    retriableStatusCodes:
+      - 500
+      - 504
+  tcp:
+    maxConnectAttempts: 5
+  grpc:
+    numRetries: 5
+    perTryTimeout: 16s
+    backOff:
+      baseInterval: 0.025s
+      maxInterval: 0.250s

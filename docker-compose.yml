@@ -11,7 +11,7 @@ services:
     volumes:
       - ./certs/server:/certs/server:rw
       - ./certs/client:/certs/client:rw
-      - ./logs/kuma-cp:/tmp
+      - ../pet-clinic-logs/kuma-cp:/tmp
     command:
       - run
       - --log-level=debug
@@ -133,13 +133,14 @@ services:
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/customers-service-app.log
+      - CONFIG_SERVER_URL=http://config-server:8888
     depends_on:
      - config-server
      - customers-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:customers-service-dp
     volumes:
-      - ./logs/app:/tmp
+      - ../pet-clinic-logs/app:/tmp
 
   customers-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -161,7 +162,7 @@ services:
       - create-dp-token
     volumes:
       - token-customers-service:/customers-service
-      - ./logs/customers-service-dp:/tmp
+      - ../pet-clinic-logs/customers-service-dp:/tmp
 
   visits-service-app:
     image: charter/spring-petclinic-visits-service
@@ -170,13 +171,14 @@ services:
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/visits-service-app.log
+      - CONFIG_SERVER_URL=http://config-server:8888
     depends_on:
      - config-server
      - visits-service-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:visits-service-dp
     volumes:
-      - ./logs/app:/tmp
+      - ../pet-clinic-logs/app:/tmp
 
   visits-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -198,7 +200,7 @@ services:
       - create-dp-token
     volumes:
       - token-visits-service:/visits-service
-      - ./logs/visits-service-dp:/tmp
+      - ../pet-clinic-logs/visits-service-dp:/tmp
 
   vets-service-app:
     image: charter/spring-petclinic-vets-service
@@ -207,6 +209,7 @@ services:
       - spring.datasource.data=classpath*:db/hsqldb/data.sql
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/vets-service-app.log
+      - CONFIG_SERVER_URL=http://config-server:8888
     mem_limit: 512M
     depends_on:
       - config-server
@@ -214,7 +217,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-dp
     volumes:
-      - ./logs/app:/tmp
+      - ../pet-clinic-logs/app:/tmp
 
   vets-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -236,7 +239,7 @@ services:
       - create-dp-token
     volumes:
       - token-vets-service:/vets-service
-      - ./logs/vets-service-dp:/tmp
+      - ../pet-clinic-logs/vets-service-dp:/tmp
 
   vets-service-v2-app:
     image: charter/spring-petclinic-vets-service
@@ -245,6 +248,7 @@ services:
       - spring.datasource.data=classpath*:db/hsqldb/data2.sql
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/vets-service-v2-app.log
+      - CONFIG_SERVER_URL=http://config-server:8888
     mem_limit: 512M
     depends_on:
       - config-server
@@ -252,7 +256,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-v2-dp
     volumes:
-      - ./logs/app:/tmp
+      - ../pet-clinic-logs/app:/tmp
 
   vets-service-v2-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -274,15 +278,15 @@ services:
       - create-dp-token
     volumes:
       - token-vets-service-v2:/vets-service-v2
-      - ./logs/vets-service-v2-dp:/tmp
+      - ../pet-clinic-logs/vets-service-v2-dp:/tmp
 
   offers-service-app:
     image: charter/spring-petclinic-offers-service
     container_name: offers-service-app
     mem_limit: 512M
     environment:
-      - spring.datasource.data=classpath*:db/hsqldb/data2.sql
       - spring.zipkin.base-url=http://jaeger-collector:9412/
+      - CONFIG_SERVER_URL=http://config-server:8888
       - LOG_FILE=/tmp/offers-service-app.log
     depends_on:
       - config-server
@@ -290,7 +294,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:offers-service-dp
     volumes:
-      - ./logs/app:/tmp
+      - ../pet-clinic-logs/app:/tmp
 
   offers-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -314,7 +318,7 @@ services:
       - create-dp-token
     volumes:
       - token-offers-service:/offers-service
-      - ./logs/offers-service-dp:/tmp
+      - ../pet-clinic-logs/offers-service-dp:/tmp
 
   api-gateway-app:
     image: charter/spring-petclinic-api-gateway
@@ -323,13 +327,14 @@ services:
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/api-gateway-app.log
+      - CONFIG_SERVER_URL=http://config-server:8888
     depends_on:
       - config-server
       - api-gateway-dp
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:api-gateway-dp
     volumes:
-      - ./logs/app:/tmp
+      - ../pet-clinic-logs/app:/tmp
 
   api-gateway-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -353,7 +358,7 @@ services:
       - create-dp-token
     volumes:
       - token-api-gateway:/api-gateway
-      - ./logs/api-gateway-dp:/tmp
+      - ../pet-clinic-logs/api-gateway-dp:/tmp
 
   mesh-gateway:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -377,7 +382,7 @@ services:
     volumes:
       - token-mesh-gateway:/mesh-gateway
       - ./policies:/petclinic/policies
-      - ./logs/mesh-gateway:/tmp
+      - ../pet-clinic-logs/mesh-gateway:/tmp
     depends_on:
       - petclinic-cp
       - create-dp-token
@@ -406,8 +411,10 @@ services:
     - "3000:3000"
 
   prometheus-server:
-    build: ./docker/prometheus
+    image: prom/prometheus:latest
     container_name: prometheus-server
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     mem_limit: 256M
     networks:
       petclinic:
@@ -428,7 +435,7 @@ services:
     container_name: promtail
     volumes:
       - ./conf:/etc/promtail
-      - ./logs:/tmp
+      - ../pet-clinic-logs:/tmp
     command: -config.file=/etc/promtail/docker-promtail-config.yaml -log.level=debug
     networks:
       - petclinic

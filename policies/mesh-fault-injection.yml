@@ -11,7 +11,7 @@ destinations:
 conf:
   abort:
     httpStatus: 500
-    percentage: 90
+    percentage: 50
 #  delay:
 #    percentage: 100
 #    value: 10s
