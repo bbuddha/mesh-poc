@@ -50,8 +50,9 @@ class ErraticResource {
      * Read List of Owners
      */
     @GetMapping
-    public List<String> findAll(@RequestParam int errorRate) {
+    public List<String> findAll(@RequestParam int errorRate, @RequestParam int delay) throws InterruptedException {
         logRequestCount();
+        Thread.sleep(delay);
         if(requestCount % errorRate == 0 ){
             throw new ServerException("Fake error.");
         }
