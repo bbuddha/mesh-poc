@@ -35,7 +35,7 @@ import java.util.List;
  */
 @RequestMapping("/erratic")
 @RestController
-@Timed("petclinic.error")
+@Timed("petclinic.erratic")
 @RequiredArgsConstructor
 @Slf4j
 class ErraticResource {
