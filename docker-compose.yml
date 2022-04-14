@@ -442,8 +442,6 @@ services:
 
   httpbin:
     image: kennethreitz/httpbin
-    profiles:
-      - "extras"
     container_name: httpbin
     networks:
       - petclinic

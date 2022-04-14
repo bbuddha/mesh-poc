@@ -52,3 +52,13 @@ destinations:
   - match:
       kuma.io/service: 'offers-service'
 
+---
+type: TrafficPermission
+name: allow-customers-service-to-httpbin-traffic
+mesh: default
+sources:
+  - match:
+      kuma.io/service: 'customers-service'
+destinations:
+  - match:
+      kuma.io/service: 'httpbin'

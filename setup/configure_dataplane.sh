@@ -89,6 +89,8 @@ networking:
   inbound:
     - port: {{ PUBLIC_PORT }}
       servicePort: {{ LOCAL_PORT }}
+      serviceProbe:
+        tcp: {}
       tags:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
@@ -112,6 +114,8 @@ networking:
   inbound:
     - port: {{ PUBLIC_PORT }}
       servicePort: {{ LOCAL_PORT }}
+      serviceProbe:
+        tcp: {}
       tags:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
@@ -131,6 +135,8 @@ networking:
   inbound:
     - port: {{ PUBLIC_PORT }}
       servicePort: {{ LOCAL_PORT }}
+      serviceProbe:
+        tcp: {}
       tags:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
@@ -156,6 +162,8 @@ networking:
   inbound:
     - port: {{ PUBLIC_PORT }}
       servicePort: {{ LOCAL_PORT }}
+      serviceProbe:
+        tcp: {}
       tags:
         kuma.io/service: vets-service
         kuma.io/protocol: http
@@ -180,6 +188,8 @@ networking:
   inbound:
     - port: {{ PUBLIC_PORT }}
       servicePort: {{ LOCAL_PORT }}
+      serviceProbe:
+        tcp: {}
       tags:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
@@ -199,6 +209,8 @@ networking:
   inbound:
     - port: {{ PUBLIC_PORT }}
       servicePort: {{ LOCAL_PORT }}
+      serviceProbe:
+        tcp: {}
       tags:
         kuma.io/service: {{ NAME }}
         kuma.io/protocol: http
@@ -228,4 +240,9 @@ networking:
 kumactl apply -f /petclinic/policies/mesh-gateway.yml
 kumactl apply -f /petclinic/policies/mesh-gateway-route.yml
 kumactl apply -f /petclinic/policies/allow-traffic-defaults.yml
+#kumactl apply -f /petclinic/policies/mesh-backends.yml
+#kumactl apply -f /petclinic/policies/mesh-traffic-log.yml
+#kumactl apply -f /petclinic/policies/mesh-traffic-trace.yml
+#kumactl apply -f /petclinic/policies/mesh-external-service.yml
+#kumactl delete traffic-permission allow-all-default
 
