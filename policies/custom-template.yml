@@ -8,7 +8,13 @@ conf:
   imports:
     - default-proxy
   modifications:
-    - listener:
+    - networkFilter:
         operation: patch
-        value: | # you can specify only part of cluster definition that will be merged into existing cluster
-          streamIdleTimeout: 5m
+        match:
+          name: envoy.filters.network.http_connection_manager
+          listenerName: mesh-gateway:HTTP:8080
+        value: |
+          name: envoy.filters.network.http_connection_manager
+          typedConfig:
+            '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+            streamIdleTimeout: 30s
