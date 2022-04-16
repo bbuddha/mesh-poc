@@ -440,6 +440,17 @@ services:
     networks:
       - petclinic
 
+  portainer:
+      image: portainer/portainer-ce:latest
+      container_name: portainer
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - portainer_data:/data:rw
+      ports:
+        - "9443:9443"
+      networks:
+        - petclinic
+
   httpbin:
     image: kennethreitz/httpbin
     container_name: httpbin
@@ -457,4 +468,5 @@ volumes:
   token-offers-service:
   token-api-gateway:
   token-mesh-gateway:
+  portainer_data:
 
