@@ -1,4 +1,14 @@
 type: TrafficPermission
+name: allow-mesh-gateway-to-all-traffic
+mesh: default
+sources:
+  - match:
+      kuma.io/service: 'mesh-gateway'
+destinations:
+  - match:
+      kuma.io/service: '*'
+---
+type: TrafficPermission
 name: allow-vets-service-to-offers-service-traffic
 mesh: default
 sources:
