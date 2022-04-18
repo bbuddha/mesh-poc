@@ -14,7 +14,7 @@ services:
       - ../pet-clinic-logs/kuma-cp:/tmp
     command:
       - run
-      - --log-level=debug
+      - --log-level=info
       - --log-output-path=/tmp/kuma-cp.log
     environment:
       # DNS name of the Kuma xDS server
@@ -364,7 +364,7 @@ services:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
     command:
       - run
-      - --log-level=debug
+      - --log-level=info
       - --log-output-path=/tmp/kuma-dp.log
       - --dns-enabled=false
     environment:
@@ -426,7 +426,7 @@ services:
     container_name: loki
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml -log.level=debug
+    command: -config.file=/etc/loki/local-config.yaml -log.level=info
     networks:
       - petclinic
 
@@ -436,7 +436,7 @@ services:
     volumes:
       - ./conf:/etc/promtail
       - ../pet-clinic-logs:/tmp
-    command: -config.file=/etc/promtail/docker-promtail-config.yaml -log.level=debug
+    command: -config.file=/etc/promtail/docker-promtail-config.yaml -log.level=info
     networks:
       - petclinic
 
