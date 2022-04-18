@@ -19,7 +19,7 @@ scrape_configs:
   - job_name: api-gateway
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['api-gateway:8000']
+      - targets: ['api-gateway:81']
 
   - job_name: customers-service-dp
     metrics_path: /metrics
@@ -29,7 +29,7 @@ scrape_configs:
   - job_name: customers-service
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['customers-service:8081']
+      - targets: ['customers-service:81']
 
   - job_name: visits-service-dp
     metrics_path: /metrics
@@ -39,7 +39,7 @@ scrape_configs:
   - job_name: visits-service
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['visits-service:8082']
+      - targets: ['visits-service:81']
 
   - job_name: vets-service-dp
     metrics_path: /metrics
@@ -49,7 +49,7 @@ scrape_configs:
   - job_name: vets-service
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['vets-service:8083']
+      - targets: ['vets-service:81']
 
   - job_name: vets-service-v2-dp
     metrics_path: /metrics
@@ -59,4 +59,4 @@ scrape_configs:
   - job_name: vets-service-v2
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['vets-service-v2:8084']
+      - targets: ['vets-service-v2:81']
