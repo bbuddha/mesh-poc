@@ -60,3 +60,13 @@ scrape_configs:
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ['vets-service-v2:81']
+
+  - job_name: offers-service-dp
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['offers-service:5670']
+
+  - job_name: offers-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['offers-service:81']
