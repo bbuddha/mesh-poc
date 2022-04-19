@@ -2,3 +2,27 @@ type: Mesh
 mesh: default
 name: default
 mtls: {}
+tracing:
+  defaultBackend: jaeger-collector
+  backends:
+    - name: jaeger-collector
+      type: zipkin
+      sampling: 100.0
+      conf:
+        url: http://jaeger-collector:9412/api/v2/spans
+logging:
+  defaultBackend: loki
+  backends:
+    - name: loki
+      format: '{"http_status":"%RESPONSE_CODE%", "start_time": "%START_TIME%", "source": "%KUMA_SOURCE_SERVICE%", "destination": "%KUMA_DESTINATION_SERVICE%", "source_address": "%KUMA_SOURCE_ADDRESS_WITHOUT_PORT%", "destination_address": "%UPSTREAM_HOST%", "duration_millis": "%DURATION%", "bytes_received": "%BYTES_RECEIVED%", "bytes_sent": "%BYTES_SENT%"}'
+      type: file
+      conf:
+        path: /tmp/kuma-access.log
+metrics:
+  enabledBackend: prometheus-1
+  backends:
+    - name: prometheus-1
+      type: prometheus
+      conf:
+        skipMTLS: true # by default mTLS metrics are also protected by mTLS. Scraping metrics with mTLS without transparent proxy is not supported at the moment.
+
