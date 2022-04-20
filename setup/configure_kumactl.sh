@@ -14,7 +14,7 @@ if [ ! -f /certs/client/cert.key ]; then
 fi
 if [ ! -f /certs/server/cert.key ]; then
   echo "Generating server certificate"
-  kumactl generate tls-certificate --type=server --cp-hostname=${cp_name} --key-file=/certs/server/cert.key --cert-file=/certs/server/cert.pem
+  kumactl generate tls-certificate --type=server --hostname=${cp_name} --key-file=/certs/server/cert.key --cert-file=/certs/server/cert.pem
   chmod 666 /certs/server/cert.key
   chmod 666 /certs/server/cert.pem
 fi
