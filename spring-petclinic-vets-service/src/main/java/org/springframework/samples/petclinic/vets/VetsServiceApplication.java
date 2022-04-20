@@ -18,8 +18,10 @@ package org.springframework.samples.petclinic.vets;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.vets.system.VetsProperties;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Maciej Szarlinski
@@ -32,4 +34,9 @@ public class VetsServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(VetsServiceApplication.class, args);
 	}
+
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 }
