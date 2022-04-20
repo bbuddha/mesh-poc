@@ -307,8 +307,6 @@ services:
       - KUMA_DATAPLANE_MESH=default
       - KUMA_DATAPLANE_NAME=offers-service
       - KUMA_DATAPLANE_RUNTIME_TOKEN_PATH=/offers-service/token
-    ports:
-      - "8085:8085"
     networks:
       petclinic:
         aliases:
@@ -404,7 +402,11 @@ services:
 
   grafana-server:
     image: grafana/grafana:master
+    container_name: grafana-server
     mem_limit: 256M
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
     networks:
       petclinic:
     ports:
