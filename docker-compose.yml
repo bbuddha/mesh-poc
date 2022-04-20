@@ -421,7 +421,7 @@ services:
     networks:
       petclinic:
     ports:
-    - "9091:9090"
+    - "9090:9090"
 
   loki:
     image: grafana/loki:latest
