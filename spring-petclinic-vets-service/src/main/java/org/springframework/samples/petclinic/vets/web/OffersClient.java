@@ -24,7 +24,7 @@ public class OffersClient {
             offers = response.getBody();
             Collections.shuffle(offers);
         } catch (Exception e) {
-            LOGGER.warn(e.getMessage());
+            LOGGER.warn("Exception caught.", e);
             offers = Collections.singletonList("Offers not available, please try later.");
         }
         return offers;
