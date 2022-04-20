@@ -1,12 +1,12 @@
 type: TrafficPermission
-name: allow-mesh-gateway-to-all-traffic
+name: allow-mesh-gateway-to-api-gateway-traffic
 mesh: default
 sources:
   - match:
       kuma.io/service: 'mesh-gateway'
 destinations:
   - match:
-      kuma.io/service: '*'
+      kuma.io/service: 'api-gateway'
 ---
 type: TrafficPermission
 name: allow-vets-service-to-offers-service-traffic
@@ -50,17 +50,6 @@ sources:
 destinations:
   - match:
       kuma.io/service: 'vets-service'
-
----
-type: TrafficPermission
-name: allow-api-gateway-to-offers-service-traffic
-mesh: default
-sources:
-  - match:
-      kuma.io/service: 'api-gateway'
-destinations:
-  - match:
-      kuma.io/service: 'offers-service'
 
 ---
 type: TrafficPermission
