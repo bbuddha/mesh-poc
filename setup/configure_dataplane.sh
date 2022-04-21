@@ -244,4 +244,3 @@ kumactl apply -f /petclinic/policies/mesh-traffic-log.yml
 kumactl apply -f /petclinic/policies/mesh-traffic-trace.yml
 kumactl apply -f /petclinic/policies/mesh-external-service.yml
 kumactl apply -f /petclinic/policies/mesh-backends.yml
-kumactl delete traffic-permission allow-all-default
