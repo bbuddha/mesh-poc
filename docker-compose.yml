@@ -118,7 +118,7 @@ services:
     restart: on-failure
 
   config-server:
-    image: charter/spring-petclinic-config-server
+    image: chtr/spring-petclinic-config-server
     container_name: config-server
     networks:
       petclinic:
@@ -126,7 +126,7 @@ services:
      - "8888:8888"
 
   customers-service-app:
-    image: charter/spring-petclinic-customers-service
+    image: chtr/spring-petclinic-customers-service
     container_name: customers-service-app
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
@@ -163,7 +163,7 @@ services:
       - ../pet-clinic-logs/customers-service-dp:/tmp
 
   visits-service-app:
-    image: charter/spring-petclinic-visits-service
+    image: chtr/spring-petclinic-visits-service
     container_name: visits-service-app
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
@@ -200,7 +200,7 @@ services:
       - ../pet-clinic-logs/visits-service-dp:/tmp
 
   vets-service-app:
-    image: charter/spring-petclinic-vets-service
+    image: chtr/spring-petclinic-vets-service
     container_name: vets-service-app
     environment:
       - spring.datasource.data=classpath*:db/hsqldb/data.sql
@@ -238,7 +238,7 @@ services:
       - ../pet-clinic-logs/vets-service-dp:/tmp
 
   vets-service-v2-app:
-    image: charter/spring-petclinic-vets-service
+    image: chtr/spring-petclinic-vets-service
     container_name: vets-service-v2-app
     environment:
       - spring.datasource.data=classpath*:db/hsqldb/data2.sql
@@ -276,7 +276,7 @@ services:
       - ../pet-clinic-logs/vets-service-v2-dp:/tmp
 
   offers-service-app:
-    image: charter/spring-petclinic-offers-service
+    image: chtr/spring-petclinic-offers-service
     container_name: offers-service-app
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
@@ -313,7 +313,7 @@ services:
       - ../pet-clinic-logs/offers-service-dp:/tmp
 
   api-gateway-app:
-    image: charter/spring-petclinic-api-gateway
+    image: chtr/spring-petclinic-api-gateway
     container_name: api-gateway-app
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
