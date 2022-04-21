@@ -120,7 +120,6 @@ services:
   config-server:
     image: charter/spring-petclinic-config-server
     container_name: config-server
-    mem_limit: 512M
     networks:
       petclinic:
     ports:
@@ -129,7 +128,6 @@ services:
   customers-service-app:
     image: charter/spring-petclinic-customers-service
     container_name: customers-service-app
-    mem_limit: 512M
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/customers-service-app.log
@@ -167,7 +165,6 @@ services:
   visits-service-app:
     image: charter/spring-petclinic-visits-service
     container_name: visits-service-app
-    mem_limit: 512M
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/visits-service-app.log
@@ -210,7 +207,6 @@ services:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/vets-service-app.log
       - CONFIG_SERVER_URL=http://config-server:8888
-    mem_limit: 512M
     depends_on:
       - config-server
       - vets-service-dp
@@ -249,7 +245,6 @@ services:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/vets-service-v2-app.log
       - CONFIG_SERVER_URL=http://config-server:8888
-    mem_limit: 512M
     depends_on:
       - config-server
       - vets-service-v2-dp
@@ -283,7 +278,6 @@ services:
   offers-service-app:
     image: charter/spring-petclinic-offers-service
     container_name: offers-service-app
-    mem_limit: 512M
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - CONFIG_SERVER_URL=http://config-server:8888
@@ -321,7 +315,6 @@ services:
   api-gateway-app:
     image: charter/spring-petclinic-api-gateway
     container_name: api-gateway-app
-    mem_limit: 512M
     environment:
       - spring.zipkin.base-url=http://jaeger-collector:9412/
       - LOG_FILE=/tmp/api-gateway-app.log
@@ -389,7 +382,6 @@ services:
   jaeger-collector:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger-collector
-    mem_limit: 512M
     environment:
       - COLLECTOR_ZIPKIN_HOST_PORT=:9412
     networks:
@@ -403,7 +395,6 @@ services:
   grafana-server:
     image: grafana/grafana:master
     container_name: grafana-server
-    mem_limit: 256M
     volumes:
       - ./docker/grafana/provisioning:/etc/grafana/provisioning
       - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
@@ -417,7 +408,6 @@ services:
     container_name: prometheus-server
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    mem_limit: 256M
     networks:
       petclinic:
     ports:
