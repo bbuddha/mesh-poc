@@ -11,7 +11,6 @@ services:
     volumes:
       - ./certs/server:/certs/server:rw
       - ./certs/client:/certs/client:rw
-      - ../pet-clinic-logs/kuma-cp:/tmp
     command:
       - run
       - --log-level=info
@@ -138,7 +137,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:customers-service-dp
     volumes:
-      - ../pet-clinic-logs/app:/tmp
+      - customers-service:/tmp:rw
 
   customers-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -160,7 +159,7 @@ services:
       - create-dp-token
     volumes:
       - token-customers-service:/customers-service
-      - ../pet-clinic-logs/customers-service-dp:/tmp
+      - customers-service:/tmp:rw
 
   visits-service-app:
     image: chtr/spring-petclinic-visits-service
@@ -175,7 +174,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:visits-service-dp
     volumes:
-      - ../pet-clinic-logs/app:/tmp
+      - visits-service:/tmp:rw
 
   visits-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -197,7 +196,7 @@ services:
       - create-dp-token
     volumes:
       - token-visits-service:/visits-service
-      - ../pet-clinic-logs/visits-service-dp:/tmp
+      - visits-service:/tmp:rw
 
   vets-service-app:
     image: chtr/spring-petclinic-vets-service
@@ -213,7 +212,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-dp
     volumes:
-      - ../pet-clinic-logs/app:/tmp
+      - vets-service:/tmp:rw
 
   vets-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -235,7 +234,7 @@ services:
       - create-dp-token
     volumes:
       - token-vets-service:/vets-service
-      - ../pet-clinic-logs/vets-service-dp:/tmp
+      - vets-service:/tmp:rw
 
   vets-service-v2-app:
     image: chtr/spring-petclinic-vets-service
@@ -251,7 +250,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:vets-service-v2-dp
     volumes:
-      - ../pet-clinic-logs/app:/tmp
+      - vets-service-v2:/tmp:rw
 
   vets-service-v2-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -273,7 +272,7 @@ services:
       - create-dp-token
     volumes:
       - token-vets-service-v2:/vets-service-v2
-      - ../pet-clinic-logs/vets-service-v2-dp:/tmp
+      - vets-service-v2:/tmp:rw
 
   offers-service-app:
     image: chtr/spring-petclinic-offers-service
@@ -288,7 +287,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:offers-service-dp
     volumes:
-      - ../pet-clinic-logs/app:/tmp
+      - offers-service:/tmp:rw
 
   offers-service-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -310,7 +309,7 @@ services:
       - create-dp-token
     volumes:
       - token-offers-service:/offers-service
-      - ../pet-clinic-logs/offers-service-dp:/tmp
+      - offers-service:/tmp:rw
 
   api-gateway-app:
     image: chtr/spring-petclinic-api-gateway
@@ -325,7 +324,7 @@ services:
     entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
     network_mode: service:api-gateway-dp
     volumes:
-      - ../pet-clinic-logs/app:/tmp
+      - api-gateway:/tmp:rw
 
   api-gateway-dp:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -349,7 +348,7 @@ services:
       - create-dp-token
     volumes:
       - token-api-gateway:/api-gateway
-      - ../pet-clinic-logs/api-gateway-dp:/tmp
+      - api-gateway:/tmp:rw
 
   mesh-gateway:
     image: ${KUMA_DP_DOCKER_IMAGE:-kuma/kuma-dp:latest}
@@ -373,7 +372,7 @@ services:
     volumes:
       - token-mesh-gateway:/mesh-gateway
       - ./policies:/petclinic/policies
-      - ../pet-clinic-logs/mesh-gateway:/tmp
+      - mesh-gateway:/tmp:rw
     depends_on:
       - petclinic-cp
       - create-dp-token
@@ -427,7 +426,13 @@ services:
     container_name: promtail
     volumes:
       - ./conf:/etc/promtail
-      - ../pet-clinic-logs:/tmp
+      - customers-service:/tmp/customers-service
+      - visits-service:/tmp/visits-service
+      - vets-service:/tmp/vets-service
+      - vets-service-v2:/tmp/vets-service-v2
+      - offers-service:/tmp/offers-service
+      - api-gateway:/tmp/api-gateway
+      - mesh-gateway:/tmp/mesh-gateway
     command: -config.file=/etc/promtail/docker-promtail-config.yaml -log.level=info
     networks:
       - petclinic
@@ -460,5 +465,12 @@ volumes:
   token-offers-service:
   token-api-gateway:
   token-mesh-gateway:
+  customers-service:
+  visits-service:
+  vets-service:
+  vets-service-v2:
+  offers-service:
+  api-gateway:
+  mesh-gateway:
   portainer_data:
 

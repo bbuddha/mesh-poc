@@ -66,8 +66,6 @@ create_mesh_gateway() {
   echo "${resource}" | kumactl apply -f - \
       --var IP="${ip_addr}" \
       --var NAME="${hostname}"
-
-  kumactl generate dataplane-token --name="${hostname}" > /"${hostname}"/token
 }
 
 #
